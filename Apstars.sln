@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apstars", "Apstars\Apstars.csproj", "{CA8DAACE-D4F4-4697-A7A5-3F6B72F6AF1A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6E37AACA-D6B2-427A-B801-646BE68B21F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apstars.Repositories.EntityFramework", "Apstars.Repositories.EntityFramework\Apstars.Repositories.EntityFramework.csproj", "{8EA67442-5342-4E1F-A96C-A14A07BBD4D4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CA8DAACE-D4F4-4697-A7A5-3F6B72F6AF1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA8DAACE-D4F4-4697-A7A5-3F6B72F6AF1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA8DAACE-D4F4-4697-A7A5-3F6B72F6AF1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA8DAACE-D4F4-4697-A7A5-3F6B72F6AF1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EA67442-5342-4E1F-A96C-A14A07BBD4D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EA67442-5342-4E1F-A96C-A14A07BBD4D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EA67442-5342-4E1F-A96C-A14A07BBD4D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EA67442-5342-4E1F-A96C-A14A07BBD4D4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CA8DAACE-D4F4-4697-A7A5-3F6B72F6AF1A} = {6E37AACA-D6B2-427A-B801-646BE68B21F2}
+		{8EA67442-5342-4E1F-A96C-A14A07BBD4D4} = {6E37AACA-D6B2-427A-B801-646BE68B21F2}
+	EndGlobalSection
+EndGlobal

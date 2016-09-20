@@ -1,6 +1,5 @@
-﻿using Autofac;
+﻿using Apstars.Bootstrapper;
 using System;
-using System.Collections.Generic;
 
 namespace Apstars
 {
@@ -10,10 +9,7 @@ namespace Apstars
     public sealed class ServiceLocator : IServiceLocator
     {
         #region Private Fields
-        private IContainer _container;
-        #endregion
-
-        #region Private Static Fields
+        private readonly IObjectContainer objectContainer = AppRuntime.Instance.CurrentApplication.ObjectContainer;
         private static readonly ServiceLocator instance = new ServiceLocator();
         #endregion
 
@@ -21,16 +17,12 @@ namespace Apstars
         /// <summary>
         /// Initializes a new instance of <c>ServiceLocator</c> class.
         /// </summary>
-        private ServiceLocator()
-        {            
-            //_container = new AutofacContainer();
-            //_container.Init();
-        }
+        private ServiceLocator() { }
         #endregion
 
         #region Public Static Properties
         /// <summary>
-        /// Gets the singleton instance of the <c>ServiceLocator</c> class.
+        /// Gets the current instance of <c>ServiceLocator</c> class.
         /// </summary>
         public static ServiceLocator Instance
         {
@@ -38,35 +30,55 @@ namespace Apstars
         }
         #endregion
 
-        #region Public Properties
+        #region IServiceLocator Members
         /// <summary>
-        /// Gets the singleton instance of the <c>ServiceLocator</c> class.
+        /// Gets the service object of the specified type.
         /// </summary>
-        public IContainer Container
+        /// <typeparam name="T">The type of the service object.</typeparam>
+        /// <returns>The instance of the service object.</returns>
+        public T GetService<T>() where T : class
         {
-            get { return _container; }
-            set { _container = value; }
+            return objectContainer.GetService<T>();
         }
-        #endregion
-
-        #region Public Methods
         /// <summary>
-        /// Gets the service instance with the given type.
+        /// Gets the service object of the specified type, with overrided
+        /// arguments provided.
         /// </summary>
-        /// <typeparam name="T">The type of the service.</typeparam>
-        /// <returns>The service instance.</returns>
-        public T GetService<T>()
+        /// <typeparam name="T">The type of the service object.</typeparam>
+        /// <param name="overridedArguments">The overrided arguments to be used when getting the service.</param>
+        /// <returns>The instance of the service object.</returns>
+        public T GetService<T>(object overridedArguments) where T : class
         {
-            return _container.Resolve<T>();
+            return objectContainer.GetService<T>(overridedArguments);
+        }
+        /// <summary>
+        /// Gets the service object of the specified type, with overrided
+        /// arguments provided.
+        /// </summary>
+        /// <param name="serviceType">The type of the service to get.</param>
+        /// <param name="overridedArguments">The overrided arguments to be used when getting the service.</param>
+        /// <returns>The instance of the service object.</returns>
+        public object GetService(Type serviceType, object overridedArguments)
+        {
+            return objectContainer.GetService(serviceType, overridedArguments);
+        }
+        /// <summary>
+        /// Resolves all the objects from the specified type.
+        /// </summary>
+        /// <param name="serviceType">The type of the objects to be resolved.</param>
+        /// <returns>A <see cref="System.Array"/> object which contains all the objects resolved.</returns>
+        public Array ResolveAll(Type serviceType)
+        {
+            return objectContainer.ResolveAll(serviceType);
         }
         /// <summary>
         /// Resolves all the objects from the specified type.
         /// </summary>
         /// <typeparam name="T">The type of the objects to be resolved.</typeparam>
         /// <returns>A <see cref="System.Array"/> object which contains all the objects resolved.</returns>
-        public IEnumerable<T> ResolveAll<T>()
+        public T[] ResolveAll<T>() where T : class
         {
-            return _container.Resolve<IEnumerable<T>>();
+            return objectContainer.ResolveAll<T>();
         }
         /// <summary>
         /// Returns a <see cref="Boolean"/> value which indicates whether the given type
@@ -76,7 +88,7 @@ namespace Apstars
         /// <returns>True if the type has been registered, otherwise, false.</returns>
         public bool Registered<T>()
         {
-            return _container.IsRegistered<T>();
+            return objectContainer.Registered<T>();
         }
         /// <summary>
         /// Returns a <see cref="Boolean"/> value which indicates whether the given type
@@ -86,19 +98,19 @@ namespace Apstars
         /// <returns>True if the type has been registered, otherwise, false.</returns>
         public bool Registered(Type type)
         {
-            return _container.IsRegistered(type);
+            return objectContainer.Registered(type);
         }
         #endregion
 
         #region IServiceProvider Members
         /// <summary>
-        /// Gets the service instance with the given type.
+        /// Gets the service object of the specified type.
         /// </summary>
-        /// <param name="serviceType">The type of the service.</param>
-        /// <returns>The service instance.</returns>
+        /// <param name="serviceType">The type of the service to get.</param>
+        /// <returns>The instance of the service object.</returns>
         public object GetService(Type serviceType)
         {
-            return _container.Resolve(serviceType);
+            return objectContainer.GetService(serviceType);
         }
 
         #endregion

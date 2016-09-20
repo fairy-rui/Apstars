@@ -7,7 +7,7 @@ using System.Text;
 namespace Apstars
 {
     /// <summary>
-    /// Represents the utility class used by Apworks.
+    /// Represents the utility class used by Apstars.
     /// </summary>
     public static class Utils
     {

@@ -10,7 +10,7 @@ namespace Apstars.Specifications
     /// Represents the extender for Expression[Func[T, bool]] type.
     /// This is part of the solution which solves
     /// the expression parameter problem when going to Entity Framework by using
-    /// Apworks specifications. For more information about this solution please
+    /// Apstars specifications. For more information about this solution please
     /// refer to http://blogs.msdn.com/b/meek/archive/2008/05/02/linq-to-entities-combining-predicates.aspx.
     /// </summary>
     public static class ExpressionFuncExtender

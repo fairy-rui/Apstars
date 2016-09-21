@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Autofac.Configuration;
 using Autofac.Core;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,12 @@ namespace Apstars.ObjectContainers.Autofac
     public class AutofacObjectContainer : ObjectContainer
     {
         #region Private Fields
-        private readonly IContainer container;
+        private readonly ContainerBuilder builder;
+        private IContainer container;
+        #endregion
+
+        #region Public Properties
+        public ContainerBuilder Builder { get { return builder; } }
         #endregion
 
         #region Ctor
@@ -23,7 +29,7 @@ namespace Apstars.ObjectContainers.Autofac
         /// </summary>
         public AutofacObjectContainer()
         {
-            //container = new ContainerBuilder().Build();
+            builder = new ContainerBuilder();
         }
         #endregion
 
@@ -71,17 +77,23 @@ namespace Apstars.ObjectContainers.Autofac
         }
         #endregion
 
-        #region Public Methods        
+        #region Public Methods   
+        /// <summary>
+        /// Initializes the object container from the configuration file.
+        /// </summary>
+        public void InitializeFromConfigFile()
+        {
+            InitializeFromConfigFile("autofac");
+        }
         /// <summary>
         /// Initializes the object container from the configuration file, specifying
         /// the name of the configuration section.
         /// </summary>
         /// <param name="configSectionName">The name of the configuration section.</param>
         public override void InitializeFromConfigFile(string configSectionName)
-        {
-            //var builder = new ContainerBuilder();
-            //builder.RegisterModule(new ConfigurationSettingsReader(configSectionName));
-           
+        {            
+            builder.RegisterModule(new ConfigurationSettingsReader(configSectionName));
+            container = builder.Build();
         }
         /// <summary>
         /// Gets the wrapped container instance.
@@ -114,7 +126,13 @@ namespace Apstars.ObjectContainers.Autofac
         {
             return this.container.IsRegistered(type);
         }
-        
+        /// <summary>
+        /// Create the <see cref="IContainer"/> instance.
+        /// </summary>
+        public void Build()
+        {
+            container = builder.Build();
+        }
         #endregion
     }
 }

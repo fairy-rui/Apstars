@@ -12,10 +12,21 @@ namespace Apstars.Tests.Configuration
         [TestInitialize()]
         public void Configuration_Initialize()
         {
-            var application = AppRuntime.Instance.ConfigureApstars().WithDefaultSettings().UsingAutofacContainer().Create();
-            application.ObjectContainer.RegisterAssemblyModules(typeof(TestService).Assembly).Build();
+            AppRuntime
+                .Instance
+                .ConfigureApstars()
+                .UsingAutofacContainerWithDefaultSettings()
+                .Create((sender, e) =>
+                {
+                    e.ObjectContainer.RegisterAssemblyModules(typeof(TestService).Assembly).Build();
+                    
+                    //GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(unityContainer);
+                })
+                .Start();
+            //var application = AppRuntime.Instance.ConfigureApstars().WithDefaultSettings().UsingAutofacContainer().Create();
+            //application.ObjectContainer.RegisterAssemblyModules(typeof(TestService).Assembly).Build();
 
-            application.Start();
+            //application.Start();
         }
 
         [TestMethod]

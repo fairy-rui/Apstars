@@ -408,7 +408,7 @@ namespace Apstars.Repositories
     /// Represents that the implemented classes are repositories.
     /// </summary>
     /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
-    public abstract class Repository<TAggregateRoot> : Repository<int, TAggregateRoot>, IRepository<TAggregateRoot>
+    public abstract class Repository<TAggregateRoot> : Repository<Guid, TAggregateRoot>, IRepository<TAggregateRoot>
         where TAggregateRoot : class, IAggregateRoot
     {
         /// <summary>

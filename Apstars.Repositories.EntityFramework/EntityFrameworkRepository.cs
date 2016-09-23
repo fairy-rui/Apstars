@@ -341,7 +341,7 @@ namespace Apstars.Repositories.EntityFramework
     /// Represents the Entity Framework repository.
     /// </summary>
     /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
-    public class EntityFrameworkRepository<TAggregateRoot> : EntityFrameworkRepository<int, TAggregateRoot>,
+    public class EntityFrameworkRepository<TAggregateRoot> : EntityFrameworkRepository<Guid, TAggregateRoot>,
                                                              IRepository<TAggregateRoot>
         where TAggregateRoot : class, IAggregateRoot
     {

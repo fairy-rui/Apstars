@@ -38,6 +38,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -71,6 +72,14 @@
     <Compile Include="Bootstrapper\AppRuntime.cs" />
     <Compile Include="Bootstrapper\IApp.cs" />
     <Compile Include="ApstarsException.cs" />
+    <Compile Include="Bus\BusException.cs" />
+    <Compile Include="Bus\DispatchingException.cs" />
+    <Compile Include="Bus\IBus.cs" />
+    <Compile Include="Bus\IEventBus.cs" />
+    <Compile Include="Bus\IMessageDispatcher.cs" />
+    <Compile Include="Bus\MessageDispatcher.cs" />
+    <Compile Include="Bus\MessageDispatchEventArgs.cs" />
+    <Compile Include="Bus\RegisterDispatchAttribute.cs" />
     <Compile Include="Config\AppConfigSource.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -103,10 +112,23 @@
     <Compile Include="Config\RegularConfigSource.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Constants.cs" />
     <Compile Include="DisposableObject.cs" />
+    <Compile Include="DomainException.cs" />
+    <Compile Include="Events\ActionDelegatedEventHandler.cs" />
+    <Compile Include="Events\DomainEvent.cs" />
+    <Compile Include="Events\EventAggregator.cs" />
+    <Compile Include="Events\HandlesAttribute.cs" />
+    <Compile Include="Events\IDomainEvent.cs" />
+    <Compile Include="Events\IDomainEventHandler.cs" />
+    <Compile Include="Events\IEvent.cs" />
+    <Compile Include="Events\IEventAggregator.cs" />
+    <Compile Include="Events\IEventHandler.cs" />
+    <Compile Include="Events\ParallelExecutionAttribute.cs" />
     <Compile Include="Exceptions\ExceptionHandler.cs" />
     <Compile Include="Exceptions\ExceptionManager.cs" />
     <Compile Include="Exceptions\IExceptionHandler.cs" />
+    <Compile Include="ExpressionParser.cs" />
     <Compile Include="Generators\IdentityGenerator.cs" />
     <Compile Include="Generators\IIdentityGenerator.cs" />
     <Compile Include="Generators\ISequenceGenerator.cs" />
@@ -115,6 +137,7 @@
     <Compile Include="IAggregateRoot.cs" />
     <Compile Include="IDependency.cs" />
     <Compile Include="IEntity.cs" />
+    <Compile Include="IHandler.cs" />
     <Compile Include="InfrastructureException.cs" />
     <Compile Include="Interception\AdditionalInterfaceToProxyAttribute.cs" />
     <Compile Include="Interception\BaseTypeForInterfaceProxyAttribute.cs" />
@@ -131,6 +154,12 @@
     <Compile Include="Repositories\IRepositoryContext.cs" />
     <Compile Include="Repositories\Repository.cs" />
     <Compile Include="Repositories\RepositoryContext.cs" />
+    <Compile Include="Serialization\IObjectSerializer.cs" />
+    <Compile Include="Serialization\ObjectBinarySerializer.cs" />
+    <Compile Include="Serialization\ObjectDataContractSerializer.cs" />
+    <Compile Include="Serialization\ObjectJsonSerializer.cs" />
+    <Compile Include="Serialization\ObjectXmlSerializer.cs" />
+    <Compile Include="Serialization\SerializationException.cs" />
     <Compile Include="ServiceLocator.cs" />
     <Compile Include="Services\IAppService.cs" />
     <Compile Include="Services\IDomainService.cs" />
@@ -180,6 +209,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

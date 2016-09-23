@@ -19,8 +19,8 @@ namespace Apstars.ObjectContainers.Autofac
         private IContainer container;
         #endregion
 
-        #region Public Properties
-        public ContainerBuilder Builder { get { return builder; } }
+        #region Internal Properties
+        internal ContainerBuilder Builder { get { return builder; } }
         #endregion
 
         #region Ctor
@@ -126,10 +126,13 @@ namespace Apstars.ObjectContainers.Autofac
         {
             return this.container.IsRegistered(type);
         }
+        #endregion
+
+        #region Internal Methods
         /// <summary>
         /// Create the <see cref="IContainer"/> instance.
         /// </summary>
-        public void Build()
+        internal void Build()
         {
             container = builder.Build();
         }

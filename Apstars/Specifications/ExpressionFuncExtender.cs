@@ -27,6 +27,13 @@ namespace Apstars.Specifications
             // apply composition of lambda expression bodies to parameters from the first expression 
             return Expression.Lambda<T>(merge(first.Body, secondBody), first.Parameters);
         }
+
+        private static Expression<T> Compose<T>(this Expression<T> source, Func<Expression, Expression> converter)
+        {
+            var map = source.Parameters.ToDictionary(p => p);
+            var body = ParameterRebinder.ReplaceParameters(map, source.Body);
+            return Expression.Lambda<T>(converter(body), source.Parameters);
+        }
         #endregion
 
         #region Public Methods
@@ -39,7 +46,7 @@ namespace Apstars.Specifications
         /// <returns>The combined expression.</returns>
         public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
         {
-            return first.Compose(second, Expression.And);
+            return first.Compose(second, Expression.AndAlso);
         }
         /// <summary>
         /// Combines two given expressions by using the OR semantics.
@@ -50,7 +57,12 @@ namespace Apstars.Specifications
         /// <returns>The combined expression.</returns>
         public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
         {
-            return first.Compose(second, Expression.Or);
+            return first.Compose(second, Expression.OrElse);
+        }
+
+        public static Expression<Func<T, bool>> Not<T>(this Expression<Func<T, bool>> source)
+        {
+            return source.Compose(Expression.Not);
         }
         #endregion
     }

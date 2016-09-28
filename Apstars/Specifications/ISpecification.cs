@@ -53,10 +53,12 @@ namespace Apstars.Specifications
         /// </summary>
         /// <returns>The reversed specification instance.</returns>
         ISpecification<T> Not();
+        
         /// <summary>
         /// Gets the LINQ expression which represents the current specification.
         /// </summary>
         /// <returns>The LINQ expression.</returns>
-        Expression<Func<T, bool>> GetExpression();
+        Expression<Func<T, bool>> Expression { get; }
+        
     }
 }

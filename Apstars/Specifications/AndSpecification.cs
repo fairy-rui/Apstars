@@ -24,12 +24,14 @@ namespace Apstars.Specifications
         /// Gets the LINQ expression which represents the current specification.
         /// </summary>
         /// <returns>The LINQ expression.</returns>
+        public override Expression<Func<T, bool>> Expression => Left.Expression.And(Right.Expression);
+        /*
         public override Expression<Func<T, bool>> GetExpression()
         {
             //var body = Expression.AndAlso(Left.GetExpression().Body, Right.GetExpression().Body);
             //return Expression.Lambda<Func<T, bool>>(body, Left.GetExpression().Parameters);
             return Left.GetExpression().And(Right.GetExpression());
-        }
+        }*/
         #endregion
     }
 

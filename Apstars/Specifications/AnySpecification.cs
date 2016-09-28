@@ -16,10 +16,13 @@ namespace Apstars.Specifications
         /// Gets the LINQ expression which represents the current specification.
         /// </summary>
         /// <returns>The LINQ expression.</returns>
+        public override Expression<Func<T, bool>> Expression => _ => true;
+        /*
         public override Expression<Func<T, bool>> GetExpression()
         {
             return o => true;
         }
+        */
         #endregion
     }
 }

@@ -24,6 +24,8 @@ namespace Apstars.Specifications
         /// Gets the LINQ expression which represents the current specification.
         /// </summary>
         /// <returns>The LINQ expression.</returns>
+        public override Expression<Func<T, bool>> Expression => Left.Expression.And(Right.Expression.Not());
+        /*
         public override Expression<Func<T, bool>> GetExpression()
         {
             var bodyNot = Expression.Not(Right.GetExpression().Body);
@@ -31,6 +33,7 @@ namespace Apstars.Specifications
 
             return Left.GetExpression().And(bodyNotExpression);
         }
+        */
         #endregion
     }
 }

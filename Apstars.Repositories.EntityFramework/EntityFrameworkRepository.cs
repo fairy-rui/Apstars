@@ -112,7 +112,7 @@ namespace Apstars.Repositories.EntityFramework
             Expression<Func<TAggregateRoot, dynamic>> sortPredicate,
             SortOrder sortOrder)
         {
-            var query = efContext.Context.Set<TAggregateRoot>().Where(specification.GetExpression());
+            var query = efContext.Context.Set<TAggregateRoot>().Where(specification.Expression);
             if (sortPredicate != null)
             {
                 switch (sortOrder)
@@ -147,7 +147,7 @@ namespace Apstars.Repositories.EntityFramework
                 throw new ArgumentNullException("sortPredicate");
            
             var query = efContext.Context.Set<TAggregateRoot>()
-                .Where(specification.GetExpression());
+                .Where(specification.Expression);
             int skip = (pageNumber - 1) * pageSize;
             int take = pageSize;
 
@@ -193,10 +193,10 @@ namespace Apstars.Repositories.EntityFramework
                     eagerLoadingPath = this.GetEagerLoadingPath(eagerLoadingProperty);
                     dbquery = dbquery.Include(eagerLoadingPath);
                 }
-                queryable = dbquery.Where(specification.GetExpression());
+                queryable = dbquery.Where(specification.Expression);
             }
             else
-                queryable = dbset.Where(specification.GetExpression());
+                queryable = dbset.Where(specification.Expression);
 
             if (sortPredicate != null)
             {
@@ -248,10 +248,10 @@ namespace Apstars.Repositories.EntityFramework
                     eagerLoadingPath = this.GetEagerLoadingPath(eagerLoadingProperty);
                     dbquery = dbquery.Include(eagerLoadingPath);
                 }
-                queryable = dbquery.Where(specification.GetExpression());
+                queryable = dbquery.Where(specification.Expression);
             }
             else
-                queryable = dbset.Where(specification.GetExpression());
+                queryable = dbset.Where(specification.Expression);
 
 
             switch (sortOrder)
@@ -303,10 +303,10 @@ namespace Apstars.Repositories.EntityFramework
                     eagerLoadingPath = this.GetEagerLoadingPath(eagerLoadingProperty);
                     dbquery = dbquery.Include(eagerLoadingPath);
                 }
-                return dbquery.Where(specification.GetExpression()).FirstOrDefault();
+                return dbquery.Where(specification.Expression).FirstOrDefault();
             }
             else
-                return dbset.Where(specification.GetExpression()).FirstOrDefault();
+                return dbset.Where(specification.Expression).FirstOrDefault();
         }
         /// <summary>
         /// Checkes whether the aggregate root, which matches the given specification, exists in the repository.

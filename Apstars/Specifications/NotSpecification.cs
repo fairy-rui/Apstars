@@ -30,11 +30,13 @@ namespace Apstars.Specifications
         /// Gets the LINQ expression which represents the current specification.
         /// </summary>
         /// <returns>The LINQ expression.</returns>
+        public override Expression<Func<T, bool>> Expression => this.spec.Expression.Not();
+        /*
         public override Expression<Func<T, bool>> GetExpression()
         {
             var body = Expression.Not(this.spec.GetExpression().Body);
             return Expression.Lambda<Func<T, bool>>(body, this.spec.GetExpression().Parameters);
-        }
+        */
         #endregion
     }
 }

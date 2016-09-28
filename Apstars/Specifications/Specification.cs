@@ -31,7 +31,7 @@ namespace Apstars.Specifications
         /// <returns>True if the specification is satisfied, otherwise false.</returns>
         public virtual bool IsSatisfiedBy(T obj)
         {
-            return this.GetExpression().Compile()(obj);
+            return this.Expression.Compile()(obj);
         }
         /// <summary>
         /// Combines the current specification instance with another specification instance
@@ -82,7 +82,19 @@ namespace Apstars.Specifications
         /// Gets the LINQ expression which represents the current specification.
         /// </summary>
         /// <returns>The LINQ expression.</returns>
-        public abstract Expression<Func<T, bool>> GetExpression();
+        public abstract Expression<Func<T, bool>> Expression { get; }
+
+        /// <summary>
+        /// Implicitly converts a given <see cref="Specification{T}"/> instance into a <see cref="Expression{TDelegate}"/> instance.
+        /// </summary>
+        /// <param name="specification"></param>
+        public static implicit operator Expression<Func<T, bool>>(Specification<T> specification) => specification.Expression;
+
+        /// <summary>
+        /// Implicitly converts a given <see cref="Expression{TDelegate}"/> instance into a <see cref="Specification{T}"/> instance.
+        /// </summary>
+        /// <param name="expression"></param>
+        public static implicit operator Specification<T>(Expression<Func<T, bool>> expression) => new ExpressionSpecification<T>(expression);
         #endregion
     }
 }

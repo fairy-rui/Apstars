@@ -207,6 +207,23 @@ namespace Apstars.Repositories
             return this.DoFindAll(new AnySpecification<TAggregateRoot>(), sortSpecification);
         }
         protected abstract IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification);
+        protected virtual PagedResult<TKey, TAggregateRoot> DoFindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize)
+        {
+            return DoFindAll(new AnySpecification<TAggregateRoot>(), sortSpecification, pageNumber, pageSize);
+        }
+        protected abstract PagedResult<TKey, TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize);
+
+        protected virtual IQueryable<TAggregateRoot> DoFindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        {
+            return DoFindAll(new AnySpecification<TAggregateRoot>(), sortSpecification, eagerLoadingProperties);
+        }
+        protected virtual PagedResult<TKey, TAggregateRoot> DoFindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        {
+            return DoFindAll(new AnySpecification<TAggregateRoot>(), sortSpecification, pageNumber, pageSize, eagerLoadingProperties);
+        }
+        protected abstract IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
+        protected abstract PagedResult<TKey, TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
+
         #endregion
 
         #endregion
@@ -422,9 +439,34 @@ namespace Apstars.Repositories
         {
             return this.DoFindAll(sortSpecification);
         }
+        public PagedResult<TKey, TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize)
+        {
+            return this.DoFindAll(sortSpecification, pageNumber, pageSize);
+        }
         public IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification)
         {
             return this.DoFindAll(specification, sortSpecification);
+        }
+        public PagedResult<TKey, TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize)
+        {
+            return this.DoFindAll(specification, sortSpecification, pageNumber, pageSize);
+        }
+
+        public IQueryable<TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        {
+            return this.DoFindAll(sortSpecification, eagerLoadingProperties);
+        }
+        public PagedResult<TKey, TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        {
+            return this.DoFindAll(sortSpecification, pageNumber, pageSize, eagerLoadingProperties);
+        }
+        public IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        {
+            return this.DoFindAll(specification, sortSpecification, eagerLoadingProperties);
+        }
+        public PagedResult<TKey, TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        {
+            return this.DoFindAll(specification, sortSpecification, pageNumber, pageSize, eagerLoadingProperties);
         }
         #endregion
 

@@ -334,9 +334,8 @@ namespace Apstars.Repositories.EntityFramework
             efContext.RegisterModified(aggregateRoot);
         }
 
-        #region New Methods
-
-        #endregion
+        #region New Methods  
+            
         protected override async Task<TAggregateRoot> DoGetByKeyAsync(TKey key)
         {
             return await efContext.Context.Set<TAggregateRoot>().FindAsync(key);
@@ -379,6 +378,97 @@ namespace Apstars.Repositories.EntityFramework
             }
             return query;
         }
+        protected override PagedResult<TKey, TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize)
+        {
+            if (pageNumber <= 0)
+                throw new ArgumentOutOfRangeException("pageNumber", pageNumber, "The pageNumber is one-based and should be larger than zero.");
+            if (pageSize <= 0)
+                throw new ArgumentOutOfRangeException("pageSize", pageSize, "The pageSize is one-based and should be larger than zero.");
+
+            var query = DoFindAll(specification, sortSpecification);
+            int skip = (pageNumber - 1) * pageSize;
+            int take = pageSize;
+
+            var pagedGroup = query.Skip(skip).Take(take).GroupBy(p => new { Total = query.Count() }).FirstOrDefault();
+            if (pagedGroup == null)
+                return null;
+            return new PagedResult<TKey, TAggregateRoot>(pagedGroup.Key.Total, (pagedGroup.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroup.Select(p => p).ToList());
+        }
+        protected override IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        {
+            var dbset = efContext.Context.Set<TAggregateRoot>();
+            IQueryable<TAggregateRoot> queryable = null;
+            if (eagerLoadingProperties != null &&
+                eagerLoadingProperties.Length > 0)
+            {
+                var eagerLoadingProperty = eagerLoadingProperties[0];
+                var eagerLoadingPath = this.GetEagerLoadingPath(eagerLoadingProperty);
+                var dbquery = dbset.Include(eagerLoadingPath);
+                for (int i = 1; i < eagerLoadingProperties.Length; i++)
+                {
+                    eagerLoadingProperty = eagerLoadingProperties[i];
+                    eagerLoadingPath = this.GetEagerLoadingPath(eagerLoadingProperty);
+                    dbquery = dbquery.Include(eagerLoadingPath);
+                }
+                queryable = dbquery.Where(specification.Expression);
+            }
+            else
+                queryable = dbset.Where(specification.Expression);
+
+            IOrderedQueryable<TAggregateRoot> orderedQueryable;
+            if (sortSpecification?.Count > 0)
+            {
+                var sortSpecificationList = sortSpecification.Specifications.ToList();
+                var firstSortSpecification = sortSpecificationList[0];
+                switch (firstSortSpecification.Item2)
+                {
+                    case SortOrder.Ascending:
+                        orderedQueryable = queryable.OrderBy(firstSortSpecification.Item1);
+                        break;
+                    case SortOrder.Descending:
+                        orderedQueryable = queryable.OrderByDescending(firstSortSpecification.Item1);
+                        break;
+                    default:
+                        return queryable;
+                }
+                for (var i = 1; i < sortSpecificationList.Count; i++)
+                {
+                    var spec = sortSpecificationList[i];
+                    switch (spec.Item2)
+                    {
+                        case SortOrder.Ascending:
+                            orderedQueryable = orderedQueryable.ThenBy(spec.Item1);
+                            break;
+                        case SortOrder.Descending:
+                            orderedQueryable = orderedQueryable.ThenByDescending(spec.Item1);
+                            break;
+                        default:
+                            continue;
+                    }
+                }
+                return orderedQueryable;
+            }
+            return queryable;
+        }
+        protected override PagedResult<TKey, TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        {
+            if (pageNumber <= 0)
+                throw new ArgumentOutOfRangeException("pageNumber", pageNumber, "The pageNumber is one-based and should be larger than zero.");
+            if (pageSize <= 0)
+                throw new ArgumentOutOfRangeException("pageSize", pageSize, "The pageSize is one-based and should be larger than zero.");
+
+            var query = DoFindAll(specification, sortSpecification, eagerLoadingProperties);
+
+            int skip = (pageNumber - 1) * pageSize;
+            int take = pageSize;
+
+            var pagedGroup = query.Skip(skip).Take(take).GroupBy(p => new { Total = query.Count() }).FirstOrDefault();
+            if (pagedGroup == null)
+                return null;
+            return new PagedResult<TKey, TAggregateRoot>(pagedGroup.Key.Total, (pagedGroup.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroup.Select(p => p).ToList());
+        }
+        #endregion
+
         #endregion
     }
 

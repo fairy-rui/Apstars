@@ -166,7 +166,15 @@ namespace Apstars.Repositories
         #region New Methods
         Task<TAggregateRoot> GetByKeyAsync(TKey key);
         IQueryable<TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification);
-        IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification);        
+        PagedResult<TKey, TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize);
+        IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification);
+        PagedResult<TKey, TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize);
+
+        IQueryable<TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
+        PagedResult<TKey, TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
+        IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecificatio, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);        
+        PagedResult<TKey, TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecificatio, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
+
         #endregion
     }
 

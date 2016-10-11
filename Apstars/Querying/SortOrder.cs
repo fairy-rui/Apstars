@@ -1,5 +1,5 @@
 ﻿
-namespace Apstars.Storage
+namespace Apstars.Querying
 {
     /// <summary>
     /// Represents the sorting style.

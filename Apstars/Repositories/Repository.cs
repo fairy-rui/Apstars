@@ -1,7 +1,9 @@
-﻿using Apstars.Specifications;
+﻿using Apstars.Querying;
+using Apstars.Specifications;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Apstars.Repositories
 {
@@ -13,7 +15,7 @@ namespace Apstars.Repositories
     /// should be performed.</typeparam>
     public abstract class Repository<TKey, TAggregateRoot> : IRepository<TKey, TAggregateRoot>
         where TKey : IEquatable<TKey>
-        where TAggregateRoot : class, IAggregateRoot<TKey>
+        where TAggregateRoot : class, IAggregateRoot<TKey>, new()
     {
         #region Private Fields
         private readonly IRepositoryContext context;
@@ -48,17 +50,17 @@ namespace Apstars.Repositories
         /// <returns>All the aggregate roots got from the repository.</returns>
         protected virtual IQueryable<TAggregateRoot> DoFindAll()
         {
-            return DoFindAll(new AnySpecification<TAggregateRoot>(), null, Storage.SortOrder.Unspecified);
+            return DoFindAll(new AnySpecification<TAggregateRoot>(), null, Querying.SortOrder.Unspecified);
         }
         /// <summary>
         /// Finds all the aggregate roots from repository, sorting by using the provided sort predicate
         /// and the specified sort order.
         /// </summary>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <returns>All the aggregate roots got from the repository, with the aggregate roots being sorted by
         /// using the provided sort predicate and the sort order.</returns>
-        protected virtual IQueryable<TAggregateRoot> DoFindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder)
+        protected virtual IQueryable<TAggregateRoot> DoFindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder)
         {
             return DoFindAll(new AnySpecification<TAggregateRoot>(), sortPredicate, sortOrder);
         }
@@ -67,12 +69,12 @@ namespace Apstars.Repositories
         /// and the specified sort order.
         /// </summary>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="pageNumber">The page number.</param>
         /// <param name="pageSize">The number of objects per page.</param>
         /// <returns>All the aggregate roots got from the repository, with the aggregate roots being sorted by
         /// using the provided sort predicate and the sort order.</returns>
-        protected virtual PagedResult<TAggregateRoot> DoFindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, int pageNumber, int pageSize)
+        protected virtual PagedResult<TKey, TAggregateRoot> DoFindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, int pageNumber, int pageSize)
         {
             return DoFindAll(new AnySpecification<TAggregateRoot>(), sortPredicate, sortOrder, pageNumber, pageSize);
         }
@@ -83,7 +85,7 @@ namespace Apstars.Repositories
         /// <returns>All the aggregate roots that match the given specification.</returns>
         protected virtual IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification)
         {
-            return DoFindAll(specification, null, Storage.SortOrder.Unspecified);
+            return DoFindAll(specification, null, Querying.SortOrder.Unspecified);
         }
         /// <summary>
         /// Finds all the aggregate roots that match the given specification, and sorts the aggregate roots
@@ -91,20 +93,20 @@ namespace Apstars.Repositories
         /// </summary>
         /// <param name="specification">The specification with which the aggregate roots should match.</param>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <returns>All the aggregate roots that match the given specification and were sorted by using the given sort predicate and the sort order.</returns>
-        protected abstract IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder);
+        protected abstract IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder);
         /// <summary>
         /// Finds all the aggregate roots that match the given specification with paging enabled, and sorts the aggregate roots
         /// by using the provided sort predicate and the specified sort order.
         /// </summary>
         /// <param name="specification">The specification with which the aggregate roots should match.</param>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="pageNumber">The number of objects per page.</param>
         /// <param name="pageSize">The number of objects per page.</param>
         /// <returns>All the aggregate roots that match the given specification and were sorted by using the given sort predicate and the sort order.</returns>
-        protected abstract PagedResult<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, int pageNumber, int pageSize);
+        protected abstract PagedResult<TKey, TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, int pageNumber, int pageSize);
         /// <summary>
         /// Finds all the aggregate roots from repository.
         /// </summary>
@@ -112,16 +114,16 @@ namespace Apstars.Repositories
         /// <returns>The aggregate root.</returns>
         protected virtual IQueryable<TAggregateRoot> DoFindAll(params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
         {
-            return DoFindAll(new AnySpecification<TAggregateRoot>(), null, Storage.SortOrder.Unspecified, eagerLoadingProperties);
+            return DoFindAll(new AnySpecification<TAggregateRoot>(), null, Querying.SortOrder.Unspecified, eagerLoadingProperties);
         }
         /// <summary>
         /// Finds all the aggregate roots from repository.
         /// </summary>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        protected virtual IQueryable<TAggregateRoot> DoFindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        protected virtual IQueryable<TAggregateRoot> DoFindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
         {
             return DoFindAll(new AnySpecification<TAggregateRoot>(), sortPredicate, sortOrder, eagerLoadingProperties);
         }
@@ -129,12 +131,12 @@ namespace Apstars.Repositories
         /// Finds all the aggregate roots from repository.
         /// </summary>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="pageNumber">The page number.</param>
         /// <param name="pageSize">The number of objects per page.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        protected virtual PagedResult<TAggregateRoot> DoFindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        protected virtual PagedResult<TKey, TAggregateRoot> DoFindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
         {
             return DoFindAll(new AnySpecification<TAggregateRoot>(), sortPredicate, sortOrder, pageNumber, pageSize, eagerLoadingProperties);
         }
@@ -146,28 +148,28 @@ namespace Apstars.Repositories
         /// <returns>The aggregate root.</returns>
         protected virtual IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
         {
-            return DoFindAll(new AnySpecification<TAggregateRoot>(), null, Storage.SortOrder.Unspecified, eagerLoadingProperties);
+            return DoFindAll(new AnySpecification<TAggregateRoot>(), null, Querying.SortOrder.Unspecified, eagerLoadingProperties);
         }
         /// <summary>
         /// Finds all the aggregate roots from repository.
         /// </summary>
         /// <param name="specification">The specification with which the aggregate roots should match.</param>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        protected abstract IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
+        protected abstract IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
         /// <summary>
         /// Finds all the aggregate roots from repository.
         /// </summary>
         /// <param name="specification">The specification with which the aggregate roots should match.</param>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="pageNumber">The page number.</param>
         /// <param name="pageSize">The number of objects per page.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        protected abstract PagedResult<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
+        protected abstract PagedResult<TKey, TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
         /// <summary>
         /// Finds a single aggregate root that matches the given specification.
         /// </summary>
@@ -197,6 +199,15 @@ namespace Apstars.Repositories
         /// </summary>
         /// <param name="aggregateRoot">The aggregate root to be updated.</param>
         protected abstract void DoUpdate(TAggregateRoot aggregateRoot);
+
+        #region New Methods
+        protected abstract Task<TAggregateRoot> DoGetByKeyAsync(TKey key);
+        protected virtual IQueryable<TAggregateRoot> DoFindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification)
+        {
+            return this.DoFindAll(new AnySpecification<TAggregateRoot>(), sortSpecification);
+        }
+        protected abstract IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification);
+        #endregion
 
         #endregion
 
@@ -237,9 +248,9 @@ namespace Apstars.Repositories
         /// Finds all the aggregate roots from repository.
         /// </summary>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <returns>The aggregate roots.</returns>
-        public IQueryable<TAggregateRoot> FindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder)
+        public IQueryable<TAggregateRoot> FindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder)
         {
             return this.DoFindAll(sortPredicate, sortOrder);
         }
@@ -257,9 +268,9 @@ namespace Apstars.Repositories
         /// </summary>
         /// <param name="specification">The specification with which the aggregate roots should match.</param>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <returns>The aggregate roots.</returns>
-        public IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder)
+        public IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder)
         {
             return this.DoFindAll(specification, sortPredicate, sortOrder);
         }
@@ -267,11 +278,11 @@ namespace Apstars.Repositories
         /// Finds all the aggregate roots from repository.
         /// </summary>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="pageNumber">The page number.</param>
         /// <param name="pageSize">The number of objects per page.</param>
         /// <returns>The aggregate roots.</returns>
-        public PagedResult<TAggregateRoot> FindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, int pageNumber, int pageSize)
+        public PagedResult<TKey, TAggregateRoot> FindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, int pageNumber, int pageSize)
         {
             return this.DoFindAll(sortPredicate, sortOrder, pageNumber, pageSize);
         }
@@ -280,11 +291,11 @@ namespace Apstars.Repositories
         /// </summary>
         /// <param name="specification">The specification with which the aggregate roots should match.</param>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="pageNumber">The number of objects per page.</param>
         /// <param name="pageSize">The number of objects per page.</param>
         /// <returns>The aggregate roots.</returns>
-        public PagedResult<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, int pageNumber, int pageSize)
+        public PagedResult<TKey, TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, int pageNumber, int pageSize)
         {
             return this.DoFindAll(specification, sortPredicate, sortOrder, pageNumber, pageSize);
         }
@@ -301,10 +312,10 @@ namespace Apstars.Repositories
         /// Finds all the aggregate roots from repository.
         /// </summary>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        public IQueryable<TAggregateRoot> FindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        public IQueryable<TAggregateRoot> FindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
         {
             return this.DoFindAll(sortPredicate, sortOrder, eagerLoadingProperties);
         }
@@ -312,12 +323,12 @@ namespace Apstars.Repositories
         /// Finds all the aggregate roots from repository.
         /// </summary>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="pageNumber">The page number.</param>
         /// <param name="pageSize">The number of objects per page.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        public PagedResult<TAggregateRoot> FindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        public PagedResult<TKey, TAggregateRoot> FindAll(Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
         {
             return this.DoFindAll(sortPredicate, sortOrder, pageNumber, pageSize, eagerLoadingProperties);
         }
@@ -336,10 +347,10 @@ namespace Apstars.Repositories
         /// </summary>
         /// <param name="specification">The specification with which the aggregate roots should match.</param>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        public IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        public IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
         {
             return this.DoFindAll(specification, sortPredicate, sortOrder, eagerLoadingProperties);
         }
@@ -348,12 +359,12 @@ namespace Apstars.Repositories
         /// </summary>
         /// <param name="specification">The specification with which the aggregate roots should match.</param>
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
-        /// <param name="sortOrder">The <see cref="Storage.SortOrder"/> enumeration which specifies the sort order.</param>
+        /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="pageNumber">The page number.</param>
         /// <param name="pageSize">The number of objects per page.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        public PagedResult<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Storage.SortOrder sortOrder, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        public PagedResult<TKey, TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, Querying.SortOrder sortOrder, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
         {
             return this.DoFindAll(specification, sortPredicate, sortOrder, pageNumber, pageSize, eagerLoadingProperties);
         }
@@ -401,6 +412,22 @@ namespace Apstars.Repositories
         {
             return this.DoExists(specification);
         }
+
+        #region New Methods
+        public Task<TAggregateRoot> GetByKeyAsync(TKey key)
+        {
+            return this.DoGetByKeyAsync(key);
+        }
+        public IQueryable<TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification)
+        {
+            return this.DoFindAll(sortSpecification);
+        }
+        public IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification)
+        {
+            return this.DoFindAll(specification, sortSpecification);
+        }
+        #endregion
+
         #endregion
     }
 
@@ -409,7 +436,7 @@ namespace Apstars.Repositories
     /// </summary>
     /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
     public abstract class Repository<TAggregateRoot> : Repository<Guid, TAggregateRoot>, IRepository<TAggregateRoot>
-        where TAggregateRoot : class, IAggregateRoot
+        where TAggregateRoot : class, IAggregateRoot, new()
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Repository{TAggregateRoot}"/> class.

@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 namespace Apstars.Application.Dto
 {
     /// <summary>
@@ -14,9 +15,9 @@ namespace Apstars.Application.Dto
     }
 
     /// <summary>
-    /// A shortcut of <see cref="IEntityDto{TPrimaryKey}"/> for most used primary key type (<see cref="int"/>).
+    /// A shortcut of <see cref="IEntityDto{TPrimaryKey}"/> for most used primary key type (<see cref="Guid"/>).
     /// </summary>
-    public interface IEntityDto : IEntityDto<int>
+    public interface IEntityDto : IEntityDto<Guid>
     {
 
     }

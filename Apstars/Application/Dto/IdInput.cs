@@ -23,17 +23,17 @@ namespace Apstars.Application.Dto
     }
 
     /// <summary>
-    /// A shortcut of <see cref="IdInput{TPrimaryKey}"/> for <see cref="int"/>.
+    /// A shortcut of <see cref="IdInput{TPrimaryKey}"/> for <see cref="Guid"/>.
     /// </summary>
     [Serializable]
-    public class IdInput : IdInput<int>
+    public class IdInput : IdInput<Guid>
     {
         public IdInput()
         {
 
         }
 
-        public IdInput(int id)
+        public IdInput(Guid id)
             : base(id)
         {
 

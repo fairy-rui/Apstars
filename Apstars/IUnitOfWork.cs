@@ -8,7 +8,7 @@ namespace Apstars
     /// </summary>
     /// <remarks>有关Unit Of Work的详细信息，请参见UnitOfWork模式：http://martinfowler.com/eaaCatalog/unitOfWork.html。
     /// </remarks>
-    public interface IUnitOfWork : IDependency
+    public interface IUnitOfWork //: IDependency
     {
         /// <summary>
         /// 获得一个<see cref="System.Boolean"/>值，该值表示当前的Unit Of Work是否支持Microsoft分布式事务处理机制。

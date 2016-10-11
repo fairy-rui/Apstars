@@ -1,5 +1,5 @@
 ﻿
-namespace Apstars.Application
+namespace Apstars.Querying
 {
     /// <summary>
     /// 表示一个提供了分页相关信息的数据传输对象。

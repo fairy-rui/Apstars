@@ -164,16 +164,77 @@ namespace Apstars.Repositories
         #endregion
 
         #region New Methods
+        /// <summary>
+        /// 根据聚合根的ID值，从仓储中异步读取聚合根。
+        /// </summary>
+        /// <param name="key">聚合根的ID值。</param>
+        /// <returns>聚合根实例。</returns>
         Task<TAggregateRoot> GetByKeyAsync(TKey key);
+        /// <summary>
+        /// Finds all the aggregate roots from repository.
+        /// </summary>
+        /// <param name="sortSpecification">The sort specification which is used for sorting.</param>     
+        /// <returns>The aggregate roots.</returns>
         IQueryable<TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification);
+        /// <summary>
+        /// Finds all the aggregate roots from repository.
+        /// </summary>
+        /// <param name="sortSpecification">The sort specification which is used for sorting.</param>     
+        /// <param name="pageNumber">The number of objects per page.</param>
+        /// <param name="pageSize">The number of objects per page.</param>
+        /// <returns>The aggregate roots.</returns>
         PagedResult<TKey, TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize);
+        /// <summary>
+        /// Finds all the aggregate roots from repository.
+        /// </summary>
+        /// <param name="specification">The specification with which the aggregate roots should match.</param>
+        /// <param name="sortSpecification">The sort specification which is used for sorting.</param>       
+        /// <returns>The aggregate roots.</returns>
         IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification);
+        /// <summary>
+        /// Finds all the aggregate roots from repository.
+        /// </summary>
+        /// <param name="specification">The specification with which the aggregate roots should match.</param>
+        /// <param name="sortSpecification">The sort specification which is used for sorting.</param>
+        /// <param name="pageNumber">The number of objects per page.</param>
+        /// <param name="pageSize">The number of objects per page.</param>
+        /// <returns>The aggregate roots.</returns>
         PagedResult<TKey, TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize);
 
+        /// <summary>
+        /// Finds all the aggregate roots from repository.
+        /// </summary>        
+        /// <param name="sortSpecification">The sort specification which is used for sorting.</param>        
+        /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
+        /// <returns>The aggregate root.</returns>  
         IQueryable<TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
+        /// <summary>
+        /// Finds all the aggregate roots from repository.
+        /// </summary>        
+        /// <param name="sortSpecification">The sort specification which is used for sorting.</param>
+        /// <param name="pageNumber">The page number.</param>
+        /// <param name="pageSize">The number of objects per page.</param>
+        /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
+        /// <returns>The aggregate root.</returns>  
         PagedResult<TKey, TAggregateRoot> FindAll(SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
-        IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecificatio, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);        
-        PagedResult<TKey, TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecificatio, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
+        /// <summary>
+        /// Finds all the aggregate roots from repository.
+        /// </summary>
+        /// <param name="specification">The specification with which the aggregate roots should match.</param>
+        /// <param name="sortSpecification">The sort specification which is used for sorting.</param>        
+        /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
+        /// <returns>The aggregate root.</returns>  
+        IQueryable<TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
+        /// <summary>
+        /// Finds all the aggregate roots from repository.
+        /// </summary>
+        /// <param name="specification">The specification with which the aggregate roots should match.</param>
+        /// <param name="sortSpecification">The sort specification which is used for sorting.</param>
+        /// <param name="pageNumber">The page number.</param>
+        /// <param name="pageSize">The number of objects per page.</param>
+        /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
+        /// <returns>The aggregate root.</returns>     
+        PagedResult<TKey, TAggregateRoot> FindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties);
 
         #endregion
     }

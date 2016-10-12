@@ -11,7 +11,7 @@ namespace Apstars.Querying
     /// </summary>
     /// <typeparam name="TKey">The type of the aggregate root key.</typeparam>
     /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
-    public sealed class SortSpecification<TKey, TAggregateRoot> : IDictionary<string, SortOrder>
+    public class SortSpecification<TKey, TAggregateRoot> : IDictionary<string, SortOrder>
         where TKey : IEquatable<TKey>
         where TAggregateRoot : class, IAggregateRoot<TKey>
     {
@@ -168,5 +168,11 @@ namespace Apstars.Querying
         {
             return sortSpecifications.GetEnumerator();
         }
+    }
+
+    public class SortSpecification<TAggregateRoot> : SortSpecification<Guid, TAggregateRoot>
+        where TAggregateRoot : class, IAggregateRoot<Guid>
+    {
+
     }
 }

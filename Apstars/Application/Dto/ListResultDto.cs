@@ -4,24 +4,27 @@ using System.Collections.Generic;
 namespace Apstars.Application.Dto
 {
     /// <summary>
-    /// Implements <see cref="IListResult{T}"/>.
+    /// Implements <see cref="IListResult{TEntity}"/>.
     /// </summary>
-    /// <typeparam name="T">Type of the items in the <see cref="Items"/> list</typeparam>
+    /// <typeparam name="TKey">The type of the key.</typeparam>
+    /// <typeparam name="TEntity">Type of the items in the <see cref="Items"/> list</typeparam>
     [Serializable]
-    public class ListResultDto<T> : IListResult<T>
+    public class ListResultDto<TKey, TEntity> : IListResult<TKey, TEntity>
+        where TKey : IEquatable<TKey>
+        where TEntity : class, IEntityDto<TKey>, new()
     {
         /// <summary>
         /// List of items.
         /// </summary>
-        public IReadOnlyList<T> Items
+        public IReadOnlyList<TEntity> Items
         {
-            get { return _items ?? (_items = new List<T>()); }
+            get { return _items ?? (_items = new List<TEntity>()); }
             set { _items = value; }
         }
-        private IReadOnlyList<T> _items;
+        private IReadOnlyList<TEntity> _items;
 
         /// <summary>
-        /// Creates a new <see cref="ListResultDto{T}"/> object.
+        /// Creates a new <see cref="ListResultDto{TEntity}"/> object.
         /// </summary>
         public ListResultDto()
         {
@@ -29,12 +32,31 @@ namespace Apstars.Application.Dto
         }
 
         /// <summary>
-        /// Creates a new <see cref="ListResultDto{T}"/> object.
+        /// Creates a new <see cref="ListResultDto{TEntity}"/> object.
         /// </summary>
         /// <param name="items">List of items</param>
-        public ListResultDto(IReadOnlyList<T> items)
+        public ListResultDto(IReadOnlyList<TEntity> items)
         {
             Items = items;
+        }
+    }
+
+    /// <summary>
+    /// Implements <see cref="IListResult{TEntity}"/>.
+    /// </summary>    
+    /// <typeparam name="TEntity">Type of the items in the <see cref="Items"/> list</typeparam>
+    [Serializable]
+    public class ListResultDto<TEntity> : ListResultDto<Guid, TEntity>        
+        where TEntity : class, IEntityDto<Guid>, new()
+    {        
+        /// <summary>
+        /// Creates a new <see cref="ListResultDto{TEntity}"/> object.
+        /// </summary>
+        /// <param name="items">List of items</param>
+        public ListResultDto(IReadOnlyList<TEntity> items)
+            : base(items)
+        {
+            
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Apstars.Querying
     /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
     public class SortSpecification<TKey, TAggregateRoot> : IDictionary<string, SortOrder>
         where TKey : IEquatable<TKey>
-        where TAggregateRoot : class, IAggregateRoot<TKey>
+        where TAggregateRoot : class, IAggregateRoot<TKey>, new()
     {
         #region Nested Internal Classes
         private class DumpMemberAccessNameVisitor : ExpressionVisitor
@@ -170,8 +170,12 @@ namespace Apstars.Querying
         }
     }
 
+    /// <summary>
+    /// Represents the sort specification in a query that is used for defining the sort field and order.
+    /// </summary>    
+    /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
     public class SortSpecification<TAggregateRoot> : SortSpecification<Guid, TAggregateRoot>
-        where TAggregateRoot : class, IAggregateRoot<Guid>
+        where TAggregateRoot : class, IAggregateRoot<Guid>, new()
     {
 
     }

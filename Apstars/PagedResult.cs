@@ -161,4 +161,27 @@ namespace Apstars
         
         #endregion
     }
+
+    /// <summary>
+    /// Represents a collection which contains a set of objects that is from
+    /// a specific page of the entire object set.
+    /// </summary>
+    /// <typeparam name="TAggregateRoot">The type of the aggregateRoot.</typeparam>
+    public class PagedResult<TAggregateRoot> : PagedResult<Guid, TAggregateRoot>
+        where TAggregateRoot : class, IAggregateRoot<Guid>, new()
+    {
+        /// <summary>
+        /// Initializes a new instance of <c>PagedResult</c> class.
+        /// </summary>
+        /// <param name="totalRecords">Total number of records contained in the entire object set.</param>
+        /// <param name="totalPages">Total number of pages.</param>
+        /// <param name="pageSize">The number of records per page.</param>
+        /// <param name="pageNumber">The current page number.</param>
+        /// <param name="data">The objects contained in the current page.</param>
+        public PagedResult(int totalRecords, int totalPages, int pageSize, int pageNumber, IList<TAggregateRoot> entities)
+            : base(totalRecords, totalPages, pageSize, pageNumber, entities)
+        {
+
+        }
+    }
 }

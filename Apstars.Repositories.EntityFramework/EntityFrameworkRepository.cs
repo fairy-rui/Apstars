@@ -11,10 +11,10 @@ namespace Apstars.Repositories.EntityFramework
     /// Represents the Entity Framework repository.
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
-    /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
-    public class EntityFrameworkRepository<TKey, TAggregateRoot> : Repository<TKey, TAggregateRoot>
+    /// <typeparam name="TEntity">The type of the aggregate root.</typeparam>
+    public class EntityFrameworkRepository<TKey, TEntity> : Repository<TKey, TEntity>
         where TKey : IEquatable<TKey>
-        where TAggregateRoot : class, IAggregateRoot<TKey>, new()
+        where TEntity : class, IAggregateRoot<TKey>, new()
     {
         #region Private Fields
         private readonly IEntityFrameworkRepositoryContext efContext;
@@ -57,7 +57,7 @@ namespace Apstars.Repositories.EntityFramework
             return memberExpr;
         }
 
-        private string GetEagerLoadingPath(Expression<Func<TAggregateRoot, dynamic>> eagerLoadingProperty)
+        private string GetEagerLoadingPath(Expression<Func<TEntity, dynamic>> eagerLoadingProperty)
         {
             MemberExpression memberExpression = this.GetMemberInfo(eagerLoadingProperty);
             var parameterName = eagerLoadingProperty.Parameters.First().Name;
@@ -82,7 +82,7 @@ namespace Apstars.Repositories.EntityFramework
         /// Adds an aggregate root to the repository.
         /// </summary>
         /// <param name="aggregateRoot">The aggregate root to be added to the repository.</param>
-        protected override void DoAdd(TAggregateRoot aggregateRoot)
+        protected override void DoAdd(TEntity aggregateRoot)
         {
             efContext.RegisterNew(aggregateRoot);
         }
@@ -91,11 +91,11 @@ namespace Apstars.Repositories.EntityFramework
         /// </summary>
         /// <param name="key">The key of the aggregate root.</param>
         /// <returns>The instance of the aggregate root.</returns>
-        protected override TAggregateRoot DoGetByKey(TKey key)
+        protected override TEntity DoGetByKey(TKey key)
         {
             return
-                efContext.Context.Set<TAggregateRoot>()
-                    .Where(Utils.BuildIdEqualsPredicate<TKey, TAggregateRoot>((TKey)key))
+                efContext.Context.Set<TEntity>()
+                    .Where(Utils.BuildIdEqualsPredicate<TKey, TEntity>((TKey)key))
                     .First();
         }
 
@@ -106,20 +106,20 @@ namespace Apstars.Repositories.EntityFramework
         /// <param name="sortPredicate">The sort predicate which is used for sorting.</param>
         /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <returns>The aggregate roots.</returns>
-        protected override IQueryable<TAggregateRoot> DoFindAll(
-            ISpecification<TAggregateRoot> specification,
-            Expression<Func<TAggregateRoot, dynamic>> sortPredicate,
+        protected override IQueryable<TEntity> DoFindAll(
+            ISpecification<TEntity> specification,
+            Expression<Func<TEntity, dynamic>> sortPredicate,
             SortOrder sortOrder)
         {
-            var query = efContext.Context.Set<TAggregateRoot>().Where(specification.Expression);
+            var query = efContext.Context.Set<TEntity>().Where(specification.Expression);
             if (sortPredicate != null)
             {
                 switch (sortOrder)
                 {
                     case SortOrder.Ascending:
-                        return query.SortBy<TKey, TAggregateRoot>(sortPredicate);
+                        return query.SortBy<TKey, TEntity>(sortPredicate);
                     case SortOrder.Descending:
-                        return query.SortByDescending<TKey, TAggregateRoot>(sortPredicate);
+                        return query.SortByDescending<TKey, TEntity>(sortPredicate);
                     default:
                         break;
                 }
@@ -136,7 +136,7 @@ namespace Apstars.Repositories.EntityFramework
         /// <param name="pageNumber">The number of objects per page.</param>
         /// <param name="pageSize">The number of objects per page.</param>
         /// <returns>The aggregate roots.</returns>
-        protected override PagedResult<TKey, TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, SortOrder sortOrder, int pageNumber, int pageSize)
+        protected override PagedResult<TKey, TEntity> DoFindAll(ISpecification<TEntity> specification, Expression<Func<TEntity, dynamic>> sortPredicate, SortOrder sortOrder, int pageNumber, int pageSize)
         {
             if (pageNumber <= 0)
                 throw new ArgumentOutOfRangeException("pageNumber", pageNumber, "The pageNumber is one-based and should be larger than zero.");
@@ -145,7 +145,7 @@ namespace Apstars.Repositories.EntityFramework
             if (sortPredicate == null)
                 throw new ArgumentNullException("sortPredicate");
            
-            var query = efContext.Context.Set<TAggregateRoot>()
+            var query = efContext.Context.Set<TEntity>()
                 .Where(specification.Expression);
             int skip = (pageNumber - 1) * pageSize;
             int take = pageSize;
@@ -153,15 +153,15 @@ namespace Apstars.Repositories.EntityFramework
             switch (sortOrder)
             {
                 case SortOrder.Ascending:
-                    var pagedGroupAscending = query.SortBy<TKey, TAggregateRoot>(sortPredicate).Skip(skip).Take(take).GroupBy(p => new { Total = query.Count() }).FirstOrDefault();
+                    var pagedGroupAscending = query.SortBy<TKey, TEntity>(sortPredicate).Skip(skip).Take(take).GroupBy(p => new { Total = query.Count() }).FirstOrDefault();
                     if (pagedGroupAscending == null)
                         return null;
-                    return new PagedResult<TKey, TAggregateRoot>(pagedGroupAscending.Key.Total, (pagedGroupAscending.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroupAscending.Select(p => p).ToList());
+                    return new PagedResult<TKey, TEntity>(pagedGroupAscending.Key.Total, (pagedGroupAscending.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroupAscending.Select(p => p).ToList());
                 case SortOrder.Descending:
-                    var pagedGroupDescending = query.SortByDescending<TKey, TAggregateRoot>(sortPredicate).Skip(skip).Take(take).GroupBy(p => new { Total = query.Count() }).FirstOrDefault();
+                    var pagedGroupDescending = query.SortByDescending<TKey, TEntity>(sortPredicate).Skip(skip).Take(take).GroupBy(p => new { Total = query.Count() }).FirstOrDefault();
                     if (pagedGroupDescending == null)
                         return null;
-                    return new PagedResult<TKey, TAggregateRoot>(pagedGroupDescending.Key.Total, (pagedGroupDescending.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroupDescending.Select(p => p).ToList());
+                    return new PagedResult<TKey, TEntity>(pagedGroupDescending.Key.Total, (pagedGroupDescending.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroupDescending.Select(p => p).ToList());
                 default:
                     break;
             }
@@ -176,10 +176,10 @@ namespace Apstars.Repositories.EntityFramework
         /// <param name="sortOrder">The <see cref="Querying.SortOrder"/> enumeration which specifies the sort order.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        protected override IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, SortOrder sortOrder, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        protected override IQueryable<TEntity> DoFindAll(ISpecification<TEntity> specification, Expression<Func<TEntity, dynamic>> sortPredicate, SortOrder sortOrder, params Expression<Func<TEntity, dynamic>>[] eagerLoadingProperties)
         {
-            var dbset = efContext.Context.Set<TAggregateRoot>();
-            IQueryable<TAggregateRoot> queryable = null;
+            var dbset = efContext.Context.Set<TEntity>();
+            IQueryable<TEntity> queryable = null;
             if (eagerLoadingProperties != null &&
                 eagerLoadingProperties.Length > 0)
             {
@@ -202,9 +202,9 @@ namespace Apstars.Repositories.EntityFramework
                 switch (sortOrder)
                 {
                     case SortOrder.Ascending:
-                        return queryable.SortBy<TKey, TAggregateRoot>(sortPredicate);
+                        return queryable.SortBy<TKey, TEntity>(sortPredicate);
                     case SortOrder.Descending:
-                        return queryable.SortByDescending<TKey, TAggregateRoot>(sortPredicate);
+                        return queryable.SortByDescending<TKey, TEntity>(sortPredicate);
                     default:
                         break;
                 }
@@ -221,7 +221,7 @@ namespace Apstars.Repositories.EntityFramework
         /// <param name="pageSize">The number of objects per page.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        protected override PagedResult<TKey, TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, Expression<Func<TAggregateRoot, dynamic>> sortPredicate, SortOrder sortOrder, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        protected override PagedResult<TKey, TEntity> DoFindAll(ISpecification<TEntity> specification, Expression<Func<TEntity, dynamic>> sortPredicate, SortOrder sortOrder, int pageNumber, int pageSize, params Expression<Func<TEntity, dynamic>>[] eagerLoadingProperties)
         {
             if (pageNumber <= 0)
                 throw new ArgumentOutOfRangeException("pageNumber", pageNumber, "The pageNumber is one-based and should be larger than zero.");
@@ -233,8 +233,8 @@ namespace Apstars.Repositories.EntityFramework
             int skip = (pageNumber - 1) * pageSize;
             int take = pageSize;
 
-            var dbset = efContext.Context.Set<TAggregateRoot>();
-            IQueryable<TAggregateRoot> queryable = null;
+            var dbset = efContext.Context.Set<TEntity>();
+            IQueryable<TEntity> queryable = null;
             if (eagerLoadingProperties != null &&
                 eagerLoadingProperties.Length > 0)
             {
@@ -256,15 +256,15 @@ namespace Apstars.Repositories.EntityFramework
             switch (sortOrder)
             {
                 case SortOrder.Ascending:
-                    var pagedGroupAscending = queryable.SortBy<TKey, TAggregateRoot>(sortPredicate).Skip(skip).Take(take).GroupBy(p => new { Total = queryable.Count() }).FirstOrDefault();
+                    var pagedGroupAscending = queryable.SortBy<TKey, TEntity>(sortPredicate).Skip(skip).Take(take).GroupBy(p => new { Total = queryable.Count() }).FirstOrDefault();
                     if (pagedGroupAscending == null)
                         return null;
-                    return new PagedResult<TKey, TAggregateRoot>(pagedGroupAscending.Key.Total, (pagedGroupAscending.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroupAscending.Select(p => p).ToList());
+                    return new PagedResult<TKey, TEntity>(pagedGroupAscending.Key.Total, (pagedGroupAscending.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroupAscending.Select(p => p).ToList());
                 case SortOrder.Descending:
-                    var pagedGroupDescending = queryable.SortByDescending<TKey, TAggregateRoot>(sortPredicate).Skip(skip).Take(take).GroupBy(p => new { Total = queryable.Count() }).FirstOrDefault();
+                    var pagedGroupDescending = queryable.SortByDescending<TKey, TEntity>(sortPredicate).Skip(skip).Take(take).GroupBy(p => new { Total = queryable.Count() }).FirstOrDefault();
                     if (pagedGroupDescending == null)
                         return null;
-                    return new PagedResult<TKey, TAggregateRoot>(pagedGroupDescending.Key.Total, (pagedGroupDescending.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroupDescending.Select(p => p).ToList());
+                    return new PagedResult<TKey, TEntity>(pagedGroupDescending.Key.Total, (pagedGroupDescending.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroupDescending.Select(p => p).ToList());
                 default:
                     break;
             }
@@ -277,9 +277,9 @@ namespace Apstars.Repositories.EntityFramework
         /// </summary>
         /// <param name="specification">The specification with which the aggregate root should match.</param>
         /// <returns>The instance of the aggregate root.</returns>
-        protected override TAggregateRoot DoFind(ISpecification<TAggregateRoot> specification)
+        protected override TEntity DoFind(ISpecification<TEntity> specification)
         {
-            return efContext.Context.Set<TAggregateRoot>().Where(specification.IsSatisfiedBy).FirstOrDefault();
+            return efContext.Context.Set<TEntity>().Where(specification.IsSatisfiedBy).FirstOrDefault();
         }
         /// <summary>
         /// Finds a single aggregate root from the repository.
@@ -287,9 +287,9 @@ namespace Apstars.Repositories.EntityFramework
         /// <param name="specification">The specification with which the aggregate root should match.</param>
         /// <param name="eagerLoadingProperties">The properties for the aggregated objects that need to be loaded.</param>
         /// <returns>The aggregate root.</returns>
-        protected override TAggregateRoot DoFind(ISpecification<TAggregateRoot> specification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        protected override TEntity DoFind(ISpecification<TEntity> specification, params Expression<Func<TEntity, dynamic>>[] eagerLoadingProperties)
         {
-            var dbset = efContext.Context.Set<TAggregateRoot>();
+            var dbset = efContext.Context.Set<TEntity>();
             if (eagerLoadingProperties != null &&
                 eagerLoadingProperties.Length > 0)
             {
@@ -312,16 +312,16 @@ namespace Apstars.Repositories.EntityFramework
         /// </summary>
         /// <param name="specification">The specification with which the aggregate root should match.</param>
         /// <returns>True if the aggregate root exists, otherwise false.</returns>
-        protected override bool DoExists(ISpecification<TAggregateRoot> specification)
+        protected override bool DoExists(ISpecification<TEntity> specification)
         {
-            var count = efContext.Context.Set<TAggregateRoot>().Count(specification.IsSatisfiedBy);
+            var count = efContext.Context.Set<TEntity>().Count(specification.IsSatisfiedBy);
             return count != 0;
         }
         /// <summary>
         /// Removes the aggregate root from current repository.
         /// </summary>
         /// <param name="aggregateRoot">The aggregate root to be removed.</param>
-        protected override void DoRemove(TAggregateRoot aggregateRoot)
+        protected override void DoRemove(TEntity aggregateRoot)
         {
             efContext.RegisterDeleted(aggregateRoot);
         }
@@ -329,21 +329,21 @@ namespace Apstars.Repositories.EntityFramework
         /// Updates the aggregate root in the current repository.
         /// </summary>
         /// <param name="aggregateRoot">The aggregate root to be updated.</param>
-        protected override void DoUpdate(TAggregateRoot aggregateRoot)
+        protected override void DoUpdate(TEntity aggregateRoot)
         {
             efContext.RegisterModified(aggregateRoot);
         }
 
         #region New Methods  
             
-        protected override async Task<TAggregateRoot> DoGetByKeyAsync(TKey key)
+        protected override async Task<TEntity> DoGetByKeyAsync(TKey key)
         {
-            return await efContext.Context.Set<TAggregateRoot>().FindAsync(key);
+            return await efContext.Context.Set<TEntity>().FindAsync(key);
         }
-        protected override IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification)
+        protected override IQueryable<TEntity> DoFindAll(ISpecification<TEntity> specification, SortSpecification<TKey, TEntity> sortSpecification)
         {
-            var query = efContext.Context.Set<TAggregateRoot>().Where(specification.Expression);
-            IOrderedQueryable<TAggregateRoot> orderedQueryable;
+            var query = efContext.Context.Set<TEntity>().Where(specification.Expression);
+            IOrderedQueryable<TEntity> orderedQueryable;
             if (sortSpecification?.Count > 0)
             {
                 var sortSpecificationList = sortSpecification.Specifications.ToList();
@@ -351,10 +351,10 @@ namespace Apstars.Repositories.EntityFramework
                 switch (firstSortSpecification.Item2)
                 {
                     case SortOrder.Ascending:
-                        orderedQueryable = query.OrderBy(firstSortSpecification.Item1);
+                        orderedQueryable = query.SortBy<TKey, TEntity>(firstSortSpecification.Item1);//query.OrderBy(firstSortSpecification.Item1);
                         break;
                     case SortOrder.Descending:
-                        orderedQueryable = query.OrderByDescending(firstSortSpecification.Item1);
+                        orderedQueryable = query.SortByDescending<TKey, TEntity>(firstSortSpecification.Item1);
                         break;
                     default:
                         return query;
@@ -365,10 +365,10 @@ namespace Apstars.Repositories.EntityFramework
                     switch (spec.Item2)
                     {
                         case SortOrder.Ascending:
-                            orderedQueryable = orderedQueryable.ThenBy(spec.Item1);
+                            orderedQueryable = orderedQueryable.SortThenBy<TKey, TEntity>(spec.Item1);
                             break;
                         case SortOrder.Descending:
-                            orderedQueryable = orderedQueryable.ThenByDescending(spec.Item1);
+                            orderedQueryable = orderedQueryable.SortThenByDescending<TKey, TEntity>(spec.Item1);
                             break;
                         default:
                             continue;
@@ -378,7 +378,7 @@ namespace Apstars.Repositories.EntityFramework
             }
             return query;
         }
-        protected override PagedResult<TKey, TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize)
+        protected override PagedResult<TKey, TEntity> DoFindAll(ISpecification<TEntity> specification, SortSpecification<TKey, TEntity> sortSpecification, int pageNumber, int pageSize)
         {
             if (pageNumber <= 0)
                 throw new ArgumentOutOfRangeException("pageNumber", pageNumber, "The pageNumber is one-based and should be larger than zero.");
@@ -392,12 +392,12 @@ namespace Apstars.Repositories.EntityFramework
             var pagedGroup = query.Skip(skip).Take(take).GroupBy(p => new { Total = query.Count() }).FirstOrDefault();
             if (pagedGroup == null)
                 return null;
-            return new PagedResult<TKey, TAggregateRoot>(pagedGroup.Key.Total, (pagedGroup.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroup.Select(p => p).ToList());
+            return new PagedResult<TKey, TEntity>(pagedGroup.Key.Total, (pagedGroup.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroup.Select(p => p).ToList());
         }
-        protected override IQueryable<TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        protected override IQueryable<TEntity> DoFindAll(ISpecification<TEntity> specification, SortSpecification<TKey, TEntity> sortSpecification, params Expression<Func<TEntity, dynamic>>[] eagerLoadingProperties)
         {
-            var dbset = efContext.Context.Set<TAggregateRoot>();
-            IQueryable<TAggregateRoot> queryable = null;
+            var dbset = efContext.Context.Set<TEntity>();
+            IQueryable<TEntity> queryable = null;
             if (eagerLoadingProperties != null &&
                 eagerLoadingProperties.Length > 0)
             {
@@ -415,7 +415,7 @@ namespace Apstars.Repositories.EntityFramework
             else
                 queryable = dbset.Where(specification.Expression);
 
-            IOrderedQueryable<TAggregateRoot> orderedQueryable;
+            IOrderedQueryable<TEntity> orderedQueryable;
             if (sortSpecification?.Count > 0)
             {
                 var sortSpecificationList = sortSpecification.Specifications.ToList();
@@ -423,10 +423,10 @@ namespace Apstars.Repositories.EntityFramework
                 switch (firstSortSpecification.Item2)
                 {
                     case SortOrder.Ascending:
-                        orderedQueryable = queryable.OrderBy(firstSortSpecification.Item1);
+                        orderedQueryable = queryable.SortBy<TKey, TEntity>(firstSortSpecification.Item1);
                         break;
                     case SortOrder.Descending:
-                        orderedQueryable = queryable.OrderByDescending(firstSortSpecification.Item1);
+                        orderedQueryable = queryable.SortByDescending<TKey, TEntity>(firstSortSpecification.Item1);
                         break;
                     default:
                         return queryable;
@@ -437,10 +437,10 @@ namespace Apstars.Repositories.EntityFramework
                     switch (spec.Item2)
                     {
                         case SortOrder.Ascending:
-                            orderedQueryable = orderedQueryable.ThenBy(spec.Item1);
+                            orderedQueryable = orderedQueryable.SortThenBy<TKey, TEntity>(spec.Item1);
                             break;
                         case SortOrder.Descending:
-                            orderedQueryable = orderedQueryable.ThenByDescending(spec.Item1);
+                            orderedQueryable = orderedQueryable.SortThenByDescending<TKey, TEntity>(spec.Item1);
                             break;
                         default:
                             continue;
@@ -450,7 +450,7 @@ namespace Apstars.Repositories.EntityFramework
             }
             return queryable;
         }
-        protected override PagedResult<TKey, TAggregateRoot> DoFindAll(ISpecification<TAggregateRoot> specification, SortSpecification<TKey, TAggregateRoot> sortSpecification, int pageNumber, int pageSize, params Expression<Func<TAggregateRoot, dynamic>>[] eagerLoadingProperties)
+        protected override PagedResult<TKey, TEntity> DoFindAll(ISpecification<TEntity> specification, SortSpecification<TKey, TEntity> sortSpecification, int pageNumber, int pageSize, params Expression<Func<TEntity, dynamic>>[] eagerLoadingProperties)
         {
             if (pageNumber <= 0)
                 throw new ArgumentOutOfRangeException("pageNumber", pageNumber, "The pageNumber is one-based and should be larger than zero.");
@@ -465,7 +465,7 @@ namespace Apstars.Repositories.EntityFramework
             var pagedGroup = query.Skip(skip).Take(take).GroupBy(p => new { Total = query.Count() }).FirstOrDefault();
             if (pagedGroup == null)
                 return null;
-            return new PagedResult<TKey, TAggregateRoot>(pagedGroup.Key.Total, (pagedGroup.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroup.Select(p => p).ToList());
+            return new PagedResult<TKey, TEntity>(pagedGroup.Key.Total, (pagedGroup.Key.Total + pageSize - 1) / pageSize, pageSize, pageNumber, pagedGroup.Select(p => p).ToList());
         }
         #endregion
 
@@ -475,13 +475,13 @@ namespace Apstars.Repositories.EntityFramework
     /// <summary>
     /// Represents the Entity Framework repository.
     /// </summary>
-    /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
-    public class EntityFrameworkRepository<TAggregateRoot> : EntityFrameworkRepository<Guid, TAggregateRoot>,
-                                                             IRepository<TAggregateRoot>
-        where TAggregateRoot : class, IAggregateRoot, new()
+    /// <typeparam name="TEntity">The type of the aggregate root.</typeparam>
+    public class EntityFrameworkRepository<TEntity> : EntityFrameworkRepository<Guid, TEntity>,
+                                                             IRepository<TEntity>
+        where TEntity : class, IAggregateRoot, new()
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EntityFrameworkRepository{TAggregateRoot}"/> class.
+        /// Initializes a new instance of the <see cref="EntityFrameworkRepository{TEntity}"/> class.
         /// </summary>
         /// <param name="context">The repository context.</param>
         public EntityFrameworkRepository(IRepositoryContext context)

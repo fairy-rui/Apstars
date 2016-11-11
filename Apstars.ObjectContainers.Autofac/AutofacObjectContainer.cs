@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using Autofac.Configuration;
-using Autofac.Core;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -83,7 +83,7 @@ namespace Apstars.ObjectContainers.Autofac
         /// </summary>
         public void InitializeFromConfigFile()
         {
-            InitializeFromConfigFile("autofac");
+            InitializeFromConfigFile("autofac.json");
         }
         /// <summary>
         /// Initializes the object container from the configuration file, specifying
@@ -91,8 +91,14 @@ namespace Apstars.ObjectContainers.Autofac
         /// </summary>
         /// <param name="configSectionName">The name of the configuration section.</param>
         public override void InitializeFromConfigFile(string configSectionName)
-        {            
-            builder.RegisterModule(new ConfigurationSettingsReader(configSectionName));
+        {
+            //Add the configuration to the ConfigurationBuilder.
+            var config = new ConfigurationBuilder();
+            config.AddJsonFile(configSectionName);
+
+            //Register the ConfigurationModule with Autofac.
+            builder.RegisterModule(new ConfigurationModule(config.Build()));
+            //builder.RegisterModule(new ConfigurationSettingsReader(configSectionName));
             container = builder.Build();
         }
         /// <summary>
@@ -102,9 +108,9 @@ namespace Apstars.ObjectContainers.Autofac
         /// <returns>The instance of the wrapped container.</returns>
         public override T GetWrappedContainer<T>()
         {
-            if (typeof(T).Equals(typeof(Container)))
+            if (typeof(T).Equals(typeof(IContainer)))
                 return (T)this.container;
-            throw new InfrastructureException("The wrapped container type provided by the current object container should be '{0}'.", typeof(Container));
+            throw new InfrastructureException("The wrapped container type provided by the current object container should be '{0}'.", typeof(IContainer));
         }
         /// <summary>
         /// Returns a <see cref="Boolean"/> value which indicates whether the given type

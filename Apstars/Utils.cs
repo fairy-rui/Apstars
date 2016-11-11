@@ -165,16 +165,16 @@ namespace Apstars
         /// if the two aggregate roots are having the same identifier.
         /// </summary>
         /// <typeparam name="TKey">The type of the key.</typeparam>
-        /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
+        /// <typeparam name="TEntity">The type of the aggregate root.</typeparam>
         /// <param name="id">The identifier value to be checked with.</param>
         /// <returns>The generated Lambda expression.</returns>
-        public static Expression<Func<TAggregateRoot, bool>> BuildIdEqualsPredicate<TKey, TAggregateRoot>(TKey id)
+        public static Expression<Func<TEntity, bool>> BuildIdEqualsPredicate<TKey, TEntity>(TKey id)
             where TKey : IEquatable<TKey>
-            where TAggregateRoot : IAggregateRoot<TKey>
+            where TEntity : IAggregateRoot<TKey>
         {
-            var parameter = Expression.Parameter(typeof(TAggregateRoot));
+            var parameter = Expression.Parameter(typeof(TEntity));
             return
-                Expression.Lambda<Func<TAggregateRoot, bool>>(
+                Expression.Lambda<Func<TEntity, bool>>(
                     Expression.Equal(Expression.Property(parameter, "ID"), Expression.Constant(id)),
                     parameter);
         }

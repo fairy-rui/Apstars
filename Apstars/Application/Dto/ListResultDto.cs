@@ -9,7 +9,7 @@ namespace Apstars.Application.Dto
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TEntity">Type of the items in the <see cref="Items"/> list</typeparam>
     [Serializable]
-    public class ListResultDto<TKey, TEntity> : IListResult<TKey, TEntity>
+    public class ListResultDto<TKey, TEntity> : IListResult<TKey, TEntity>, IEnumerable<TEntity>
         where TKey : IEquatable<TKey>
         where TEntity : class, IEntityDto<TKey>, new()
     {
@@ -39,6 +39,26 @@ namespace Apstars.Application.Dto
         {
             Items = items;
         }
+       
+        #region IEnumerable<TEntity> Members
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>A System.Collections.Generic.IEnumerator{TEntity} that can be used to iterate through
+        /// the collection.</returns>
+        public IEnumerator<TEntity> GetEnumerator() => _items.GetEnumerator();
+
+        #endregion
+
+        #region IEnumerable Members
+        /// <summary>
+        /// Returns an enumerator that iterates through a collection.
+        /// </summary>
+        /// <returns>An System.Collections.IEnumerator object that can be used to iterate through
+        /// the collection.</returns>
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => _items.GetEnumerator();
+
+        #endregion
     }
 
     /// <summary>

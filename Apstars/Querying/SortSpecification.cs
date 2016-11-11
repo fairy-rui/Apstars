@@ -10,10 +10,10 @@ namespace Apstars.Querying
     /// Represents the sort specification in a query that is used for defining the sort field and order.
     /// </summary>
     /// <typeparam name="TKey">The type of the aggregate root key.</typeparam>
-    /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
-    public class SortSpecification<TKey, TAggregateRoot> : IDictionary<string, SortOrder>
+    /// <typeparam name="TEntity">The type of the aggregate root.</typeparam>
+    public class SortSpecification<TKey, TEntity> : IDictionary<string, SortOrder>
         where TKey : IEquatable<TKey>
-        where TAggregateRoot : class, IAggregateRoot<TKey>, new()
+        where TEntity : class, IAggregateRoot<TKey>, new()
     {
         #region Nested Internal Classes
         private class DumpMemberAccessNameVisitor : ExpressionVisitor
@@ -34,7 +34,7 @@ namespace Apstars.Querying
 
         private readonly Dictionary<string, SortOrder> sortSpecifications = new Dictionary<string, SortOrder>();
 
-        public static readonly SortSpecification<TKey, TAggregateRoot> None = new SortSpecification<TKey, TAggregateRoot>() { { x => x.ID, SortOrder.Unspecified } };
+        public static readonly SortSpecification<TKey, TEntity> None = new SortSpecification<TKey, TEntity>() { { x => x.ID, SortOrder.Unspecified } };
 
         public SortOrder this[string key]
         {
@@ -81,15 +81,15 @@ namespace Apstars.Querying
             }
         }
 
-        private static Expression<Func<TAggregateRoot, object>> CreateLambdaExpression(string propertyName)
+        private static Expression<Func<TEntity, object>> CreateLambdaExpression(string propertyName)
         {
-            var param = Expression.Parameter(typeof(TAggregateRoot), "x");
+            var param = Expression.Parameter(typeof(TEntity), "x");
             Expression body = param;
             foreach (var member in propertyName.Split('.'))
             {
                 body = Expression.Property(body, member);
             }
-            return Expression.Lambda<Func<TAggregateRoot, object>>(Expression.Convert(body, typeof(object)), param);
+            return Expression.Lambda<Func<TEntity, object>>(Expression.Convert(body, typeof(object)), param);
         }
 
         public void Add(KeyValuePair<string, SortOrder> item)
@@ -102,7 +102,7 @@ namespace Apstars.Querying
             sortSpecifications.Add(key, value);
         }
 
-        public void Add(Expression<Func<TAggregateRoot, object>> sortExpression, SortOrder sortOrder)
+        public void Add(Expression<Func<TEntity, object>> sortExpression, SortOrder sortOrder)
         {
             var visitor = new DumpMemberAccessNameVisitor();
             visitor.Visit(sortExpression);
@@ -113,13 +113,13 @@ namespace Apstars.Querying
             }
         }
 
-        public IEnumerable<Tuple<Expression<Func<TAggregateRoot, object>>, SortOrder>> Specifications
+        public IEnumerable<Tuple<Expression<Func<TEntity, object>>, SortOrder>> Specifications
         {
             get
             {
                 foreach (var kvp in sortSpecifications)
                 {
-                    yield return new Tuple<Expression<Func<TAggregateRoot, object>>, SortOrder>(CreateLambdaExpression(kvp.Key), kvp.Value);
+                    yield return new Tuple<Expression<Func<TEntity, object>>, SortOrder>(CreateLambdaExpression(kvp.Key), kvp.Value);
                 }
             }
         }
@@ -173,9 +173,9 @@ namespace Apstars.Querying
     /// <summary>
     /// Represents the sort specification in a query that is used for defining the sort field and order.
     /// </summary>    
-    /// <typeparam name="TAggregateRoot">The type of the aggregate root.</typeparam>
-    public class SortSpecification<TAggregateRoot> : SortSpecification<Guid, TAggregateRoot>
-        where TAggregateRoot : class, IAggregateRoot<Guid>, new()
+    /// <typeparam name="TEntity">The type of the aggregate root.</typeparam>
+    public class SortSpecification<TEntity> : SortSpecification<Guid, TEntity>
+        where TEntity : class, IAggregateRoot<Guid>, new()
     {
 
     }

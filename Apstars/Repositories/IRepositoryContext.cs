@@ -18,7 +18,7 @@ namespace Apstars.Repositories
         /// <summary>
         /// 将指定的聚合根标注为“新建”状态。
         /// </summary>
-        /// <typeparam name="TAggregateRoot">需要标注状态的聚合根类型。</typeparam>
+        /// <typeparam name="TEntity">需要标注状态的聚合根类型。</typeparam>
         /// <param name="obj">需要标注状态的聚合根。</param>
         void RegisterNew(object obj);
         /// <summary>
